@@ -135,7 +135,7 @@ def pdf_to_image(pdf_path, page_num):
     page = doc[page_num]
 
     pix = page.get_pixmap(
-        matrix=fitz.Matrix(5, 5),
+        matrix=fitz.Matrix(3, 3),
         alpha=False
     )
 
