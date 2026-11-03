@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>File Matching Studio</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #172033;
+            --muted: #697586;
+            --border: #e3e9f2;
+            --blue: #315efb;
+            --blue-light: #edf2ff;
+            --green: #087f69;
+            --purple: #7048e8;
+            --orange: #c76a0b;
+            --red: #c92a2a;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: auto;
+            padding: 32px 22px 50px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            background: var(--blue-light);
+            color: var(--blue);
+            border-radius: 14px;
+            font-size: 25px;
+        }
+
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+            font-size: 27px;
+            letter-spacing: -0.7px;
+        }
+
+        h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .subtitle {
+            margin: 0;
+        }
+
+        .section {
+            margin-top: 28px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section-heading p {
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 23px;
+            box-shadow: 0 5px 18px rgba(28, 45, 80, 0.035);
+            min-width: 0;
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--blue-light);
+            font-size: 21px;
+        }
+
+        .card-icon.green {
+            background: #e7f8f1;
+        }
+
+        .card-icon.purple {
+            background: #f0eaff;
+        }
+
+        .card-top h2 {
+            margin: 0;
+        }
+
+        .card-top p {
+            margin: 4px 0 0;
+            font-size: 13px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border: 1px dashed #bdc9db;
+            border-radius: 10px;
+            background: #f9fbfe;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        button {
+            width: 100%;
+            min-height: 43px;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 9px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.15s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .btn-blue {
+            background: var(--blue);
+        }
+
+        .btn-green {
+            background: var(--green);
+        }
+
+        .btn-purple {
+            background: var(--purple);
+        }
+
+        .btn-orange {
+            background: var(--orange);
+        }
+
+        .btn-red {
+            background: var(--red);
+        }
+
+        .saved-box {
+            border-top: 1px solid var(--border);
+            margin-top: 19px;
+            padding-top: 16px;
+        }
+
+        .saved-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 190px;
+            overflow-y: auto;
+        }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 11px;
+            background: #f7f9fc;
+            border: 1px solid #edf0f5;
+            border-radius: 8px;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .file-row span:last-child {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .file-symbol {
+            flex-shrink: 0;
+            font-size: 17px;
+        }
+
+        .empty {
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .count {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 20px;
+            background: var(--blue-light);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .clear-card {
+            margin-top: 16px;
+            padding: 17px 20px;
+            border: 1px solid #f2d6b8;
+            border-radius: 13px;
+            background: #fffaf4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .clear-card h3 {
+            margin-bottom: 4px;
+        }
+
+        .clear-card p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .clear-card form {
+            width: 210px;
+            flex-shrink: 0;
+        }
+
+        .clear-card button {
+            min-height: 40px;
+        }
+
+        .run-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .run-card form {
+            margin-top: auto;
+        }
+
+        .run-card p {
+            flex: 1;
+        }
+
+        .message {
+            padding: 13px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .message.success {
+            background: #e9f8ef;
+            border: 1px solid #c8ecd4;
+            color: #176b3a;
+        }
+
+        .message.error {
+            background: #fff0f0;
+            border: 1px solid #f5d0d0;
+            color: #a52323;
+        }
+
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .pdf-card {
+            min-width: 0;
+        }
+
+        .pdf-frame {
+            width: 100%;
+            height: 400px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: #f8fafc;
+        }
+
+        .pdf-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .pdf-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 720px) {
+            .container {
+                padding: 22px 14px 35px;
+            }
+
+            .grid, .pdf-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .clear-card {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .clear-card form {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .pdf-frame {
+                height: 350px;
+            }
+        }
+        .result-section {
+    margin-top: 30px;
+}
+
+    .page-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 18px rgba(28,45,80,0.035);
+    }
+
+    .image-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .image-card {
+        flex: 1;
+        text-align: center;
+    }
+
+    .image-card img {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }
+
+    .image-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .vs-label {
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        color: var(--purple);
+        margin: 15px 0;
+    }
+
+    .combined-card {
+        text-align: center;
+    }
+
+    .combined-card img {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .image-row {
+            flex-direction: column;
+        }
+    }
+
+
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">▤</div>
+            <div>
+                <h1>File Matching Studio</h1>
+                <p class="subtitle">
+                    Upload, process and review your files in one place.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- STATUS MESSAGES -->
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="message {{ category }}">{{ message }}</div>
+    {% endfor %}
+
+    <!-- UPLOADS -->
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <h2>File uploads</h2>
+                <p>Keep your main file and update the sub files as needed.</p>
+            </div>
+        </div>
+
+        <div class="grid">
+
+            <!-- MAIN FILE -->
+            <div class="card">
+                <div class="card-top">
+                    <div class="card-icon">📄</div>
+                    <div>
+                        <h2>Main File</h2>
+                        <p>Upload your main document.</p>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('upload_main') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+
+                    <input class="file-input"
+                           type="file"
+                           name="main_file"
+                           required>
+
+                    <button class="btn-blue" type="submit">
+                        ↑ &nbsp; Save Main File
+                    </button>
+                </form>
+
+                <div class="saved-box">
+                    <h3>Saved main file</h3>
+
+                    {% if main_filename %}
+                        <div class="file-row">
+                            <span class="file-symbol">📄</span>
+                            <span>{{ main_filename }}</span>
+                        </div>
+                    {% else %}
+                        <div class="empty">No main file uploaded yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- SUB FILES -->
+             <div class="card">
+                <div class="card-top">
+                    <div class="card-icon green">📚</div>
+                    <div>
+                        <h2>Sub Files</h2>
+                        <p>Select multiple documents for matching.</p>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('upload_subs') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+
+                    <input class="file-input"
+                           type="file"
+                           name="sub_files"
+                           multiple
+                           required>
+
+                    <button class="btn-blue" type="submit">
+                        ↑ &nbsp; Save Sub Files
+                    </button>
+                </form>
+
+                <div class="saved-box">
+                    <h3>
+                        Saved sub files
+                        <span class="count">{{ sub_files|length }}</span>
+                    </h3>
+
+                    <div class="saved-list">
+                        {% for filename in sub_files %}
+                            <div class="file-row">
+                                <span class="file-symbol">📎</span>
+                                <span>{{ filename }}</span>
+                            </div>
+                        {% else %}
+                            <div class="empty">No sub files uploaded yet.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CLEAR SUB FILES AND GENERATED OUTPUTS -->
+        <div class="clear-card">
+            <div>
+                <h3>Clear current batch</h3>
+                <p>
+                    Deletes sub files from Input and clears Output and
+                    Marked. Your main file remains saved.
+                </p>
+            </div>
+
+            <form action="{{ url_for('clear_subs') }}"
+                  method="POST"
+                  onsubmit="return confirm('Delete all sub files and clear Output and Marked? The main file will be preserved.');">
+
+                <button class="btn-orange" type="submit">
+                    Clear Sub Files
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- SCRIPT EXECUTION -->
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <h2>Processing</h2>
+                <p>Run your existing Python scripts.</p>
+            </div>
+        </div>
+
+       {# <div class="grid">
+
+            <div class="card run-card">
+                <div class="card-top">
+                    <div class="card-icon green">⚙️</div>
+                    <div>
+                        <h2>Main Processing</h2>
+                        <p>Run main.py</p>
+                    </div>
+                </div>
+
+                <p>Process the main file and current sub files.</p>
+
+                <form action="{{ url_for('run_main') }}" method="POST">
+                    <button class="btn-green" type="submit">
+                        ▶ &nbsp; Execute main.py
+                    </button>
+                </form>
+            </div>
+            #}
+
+            <div class="card run-card">
+                <div class="card-top">
+                    <div class="card-icon purple">✓</div>
+                    <div>
+                        <h2>Marking</h2>
+                        <p>Run marking.py</p>
+                    </div>
+                </div>
+
+                <p>Run the marking script and generate marked results.</p>
+
+                <form action="{{ url_for('run_marking') }}" method="POST">
+                    <button class="btn-purple" type="submit">
+                        ▶ &nbsp; Execute marking.py
+                    </button>
+                </form>
+            </div>
+    </div>
+           </section>
+
+    {# PDF OUTPUT
+    <section class="section">
+        <div class="section-heading">
+            <div>
+                <h2>Marked PDF results</h2>
+                <p>Preview the PDFs currently saved in the Marked folder.</p>
+            </div>
+            <span class="count">{{ pdf_files|length }} PDFs</span>
+        </div>
+
+        <div class="pdf-grid">
+            {% for pdf in pdf_files %}
+                <div class="card pdf-card">
+                    <div class="card-top">
+                        <div class="card-icon purple">📕</div>
+                        <div>
+                            <h2>{{ pdf.name }}</h2>
+                            <p>Generated PDF</p>
+                        </div>
+                    </div>
+
+                    <iframe
+                        class="pdf-frame"
+                        src="{{ url_for('view_pdf', filename=pdf.name) }}"
+                        title="{{ pdf.name }}">
+                    </iframe>
+
+                    <a class="pdf-link"
+                       href="{{ url_for('view_pdf', filename=pdf.name) }}"
+                       target="_blank">
+                        Open PDF in new tab ↗
+                    </a>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="empty">
+                        No PDFs found yet. Run your processing scripts
+                        to generate results in the Marked folder.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% for page in pages %}
+
+<h3>{{ page.folder }}</h3>
+
+<div style="display:flex; gap:20px;">
+    <img src="{{ url_for('page_image',
+                         folder=page.folder,
+                         filename=page.left) }}"
+         width="400">
+
+    <img src="{{ url_for('page_image',
+                         folder=page.folder,
+                         filename=page.right) }}"
+         width="400">
+</div>
+
+<div style="margin-top:20px; text-align:center;">
+    <h4>VS</h4>
+
+    <img src="{{ url_for('page_image',
+                         folder=page.folder,
+                         filename=page.combined) }}"
+         width="800">
+</div>
+
+{% endfor %}#}
+
+    <section class="section">
+
+    <div class="card">
+
+        <div class="section-heading">
+            <div>
+                <h2>Comparison Results</h2>
+                <p>Generated images from OverlayComparison folder.</p>
+            </div>
+        </div>
+
+        {% for page in pages %}
+
+        <div class="page-card">
+
+            <h2>{{ page.folder }}</h2>
+
+            <div class="image-row">
+
+                <div class="image-card">
+                    <div class="image-title">
+                        {{ page.left }}
+                    </div>
+
+                    <img src="{{ url_for('page_image',
+                                         folder=page.folder,
+                                         filename=page.left) }}"
+                         alt="{{ page.left }}">
+                </div>
+
+                <div class="image-card">
+                    <div class="image-title">
+                        {{ page.right }}
+                    </div>
+
+                    <img src="{{ url_for('page_image',
+                                         folder=page.folder,
+                                         filename=page.right) }}"
+                         alt="{{ page.right }}">
+                </div>
+
+            </div>
+
+            <div class="vs-label">
+                VS
+            </div>
+
+            <div class="combined-card">
+
+                <div class="image-title">
+                    Combined Result
+                </div>
+
+                <img src="{{ url_for('page_image',
+                                     folder=page.folder,
+                                     filename=page.combined) }}"
+                     alt="Combined">
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+    </div>
+    </section>
+
+
+
+    <!-- CLEAR ALL -->
+    <section class="section">
+        <div class="card">
+            <div class="card-top">
+                <div class="card-icon">🗑️</div>
+                <div>
+                    <h2>Clear everything</h2>
+                    <p>
+                        Delete the main file, all sub files, and generated
+                        files in Output and Marked.
+                    </p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('clear_all') }}"
+                  method="POST"
+                  onsubmit="return confirm('Delete all uploaded files and generated outputs?');">
+
+                <button class="btn-red" type="submit">
+                    Clear All Files
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer">
+        File Matching Studio · Local Flask application
+    </footer>
+
+</div>
+</body>
+</html>
